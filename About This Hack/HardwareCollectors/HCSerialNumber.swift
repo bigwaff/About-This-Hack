@@ -7,6 +7,9 @@ class HCSerialNumber {
     private lazy var HardwareInfo: (serialNumber: String, details: String) = {
         ATHLogger.debug("Initializing Serial Number & Hardware Info...", category: .hardware)
         
+        // Race condition on initial app launch. Caches empty. Sleep for sometime to give cached data time to load
+        Thread.sleep(forTimeInterval: 0.65)
+        
         // Use cached data from HardwareCollector
         guard let content = HardwareCollector.shared.getCachedFileContent(InitGlobVar.hwFilePath) else {
             ATHLogger.error("No hardware info available from HardwareCollector for serial number.", category: .hardware)

@@ -190,6 +190,30 @@ func ioRegFullPathContent(path ioRegPath: String, key ioRegKey: String, encode i
     return ioRegValue
 }
 
+func getIORegValueOSStringAsString(path ioRegPath: String, key ioRegKey: String, encode ioEncode: String) -> String
+    {
+    var rootPath: io_registry_entry_t
+    var masterPort = IOMainorMasterPortDefault
+    
+    guard IOMasterPort(bootstrap_port, &masterPort) == KERN_SUCCESS else {
+        print("\(thisComponent) : NO successful Acces with mastreport \(masterPort)")
+        return ""
+    }
+    guard  !(IORegistryEntryFromPath(masterPort, ioRegPath) == 0) else {
+        print("\(thisComponent) : NO successful Access with mastreport \(masterPort) to path \(ioRegPath)")
+        return ""
+    }
+
+    rootPath = IORegistryEntryFromPath(masterPort, ioRegPath)
+            
+    let ioRegValue = IORegistryEntryCreateCFProperty(rootPath, ioRegKey as CFString, kCFAllocatorDefault, 0).takeUnretainedValue() as? String ?? ""
+
+    IOObjectRelease(rootPath)
+    print("\(thisComponent) : Process \(rootPath) released for access to \(ioRegPath) with \(ioRegKey)")
+
+    return ioRegValue
+    }
+
 func getCleanedIORegValueAsString(path ioRegPath: String, key ioRegKey: String, encode ioEncode: String) -> String {
 	var rootPath: io_registry_entry_t
 	var masterPort = IOMainorMasterPortDefault
